@@ -1,28 +1,12 @@
-"use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __knownSymbol = (name, symbol) => (symbol = Symbol[name]) ? symbol : Symbol.for("Symbol." + name);
 var __typeError = (msg) => {
   throw TypeError(msg);
 };
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var __decoratorStart = (base) => [, , , __create(base?.[__knownSymbol("metadata")] ?? null)];
 var __decoratorStrings = ["class", "method", "getter", "setter", "accessor", "field", "value", "get", "set"];
 var __expectFn = (fn) => fn !== void 0 && typeof fn !== "function" ? __typeError("Function expected") : fn;
@@ -62,30 +46,23 @@ var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read fr
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
 
-// src/index.ts
-var src_exports = {};
-__export(src_exports, {
-  Repo: () => Repo,
-  Service: () => Service,
-  createNestApp: () => createNestApp
-});
-module.exports = __toCommonJS(src_exports);
-
 // src/nest-server.ts
-var import_core = require("@nestjs/core");
-var import_config = require("@nestjs/config");
+import { NestFactory } from "@nestjs/core";
+import { ConfigService } from "@nestjs/config";
 
 // src/create-openapi.ts
-var import_swagger = require("@nestjs/swagger");
-var import_fs_extra = require("fs-extra");
-var import_js_yaml = require("js-yaml");
+import {
+  SwaggerModule
+} from "@nestjs/swagger";
+import { ensureFile, writeFile } from "fs-extra";
+import { dump } from "js-yaml";
 var createOpenApi = async (app, path, openApi, options, openApiPath) => {
-  const document = import_swagger.SwaggerModule.createDocument(app, openApi, options);
-  import_swagger.SwaggerModule.setup(path ?? "swagger", app, document);
+  const document = SwaggerModule.createDocument(app, openApi, options);
+  SwaggerModule.setup(path ?? "swagger", app, document);
   const filePath = openApiPath ?? "docs/openapi/openapi.yaml";
   try {
-    await (0, import_fs_extra.ensureFile)(filePath);
-    await (0, import_fs_extra.writeFile)(filePath, (0, import_js_yaml.dump)(document, { noRefs: true }));
+    await ensureFile(filePath);
+    await writeFile(filePath, dump(document, { noRefs: true }));
     console.log("OpenAPI written to ", filePath);
   } catch (err) {
     console.error(err);
@@ -94,11 +71,11 @@ var createOpenApi = async (app, path, openApi, options, openApiPath) => {
 };
 
 // src/nest-server.ts
-var import_common = require("@nestjs/common");
-async function createNestApp({ name, docsUrl, module: module2, corsOptions, openApiPath }, documentBuilder, swaggerOptions) {
-  const app = await import_core.NestFactory.create(module2);
-  app.useGlobalPipes(new import_common.ValidationPipe({ transform: true }));
-  const config = app.get(import_config.ConfigService);
+import { Logger, ValidationPipe } from "@nestjs/common";
+async function createNestApp({ name, docsUrl, module, corsOptions, openApiPath }, documentBuilder, swaggerOptions) {
+  const app = await NestFactory.create(module);
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  const config = app.get(ConfigService);
   const port = config.get("PORT") || 8080;
   const environment = config.get("environment");
   const globalPrefix = "api";
@@ -117,41 +94,40 @@ async function createNestApp({ name, docsUrl, module: module2, corsOptions, open
   }
   const rootPath = `http://localhost:${port}/${globalPrefix}`;
   await app.listen(port, () => {
-    import_common.Logger.log(`Running in ${environment} mode`);
-    import_common.Logger.log(`\u{1F680} Application is running on: ${rootPath}`);
-    import_common.Logger.log(`Docs at: ${rootPath}/swagger`);
+    Logger.log(`Running in ${environment} mode`);
+    Logger.log(`\u{1F680} Application is running on: ${rootPath}`);
+    Logger.log(`Docs at: ${rootPath}/swagger`);
   });
   return app;
 }
 
 // src/service.ts
-var import_common2 = require("@nestjs/common");
+import { Injectable, Logger as Logger2 } from "@nestjs/common";
 var _Service_decorators, _init;
-_Service_decorators = [(0, import_common2.Injectable)()];
+_Service_decorators = [Injectable()];
 var Service = class {
   logger;
   constructor(name) {
-    this.logger = new import_common2.Logger(name);
+    this.logger = new Logger2(name);
   }
 };
 _init = __decoratorStart(null);
 Service = __decorateElement(_init, 0, "Service", _Service_decorators, Service);
 __runInitializers(_init, 1, Service);
 var _Repo_decorators, _init2;
-_Repo_decorators = [(0, import_common2.Injectable)()];
+_Repo_decorators = [Injectable()];
 var Repo = class {
   logger;
   constructor(name) {
-    this.logger = new import_common2.Logger(name);
+    this.logger = new Logger2(name);
   }
 };
 _init2 = __decoratorStart(null);
 Repo = __decorateElement(_init2, 0, "Repo", _Repo_decorators, Repo);
 __runInitializers(_init2, 1, Repo);
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
+export {
   Repo,
   Service,
   createNestApp
-});
-//# sourceMappingURL=index.js.map
+};
+//# sourceMappingURL=index.mjs.map
