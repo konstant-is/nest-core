@@ -11,13 +11,21 @@ export interface INestAppConfig {
   name: string;
   docsUrl: string;
   module: any;
+  enableCors?: boolean;
   corsOptions?: CorsOptions;
   openApiPath?: string;
   port?: number;
 }
 
 export async function createNestApp<T>(
-  { name, docsUrl, module, corsOptions, openApiPath }: INestAppConfig,
+  {
+    name,
+    docsUrl,
+    module,
+    corsOptions,
+    openApiPath,
+    enableCors,
+  }: INestAppConfig,
   documentBuilder: Pick<
     OpenAPIObject,
     "openapi" | "info" | "servers" | "security" | "tags" | "externalDocs"
@@ -42,10 +50,8 @@ export async function createNestApp<T>(
     openApiPath
   );
 
-  if (environment === "production" && corsOptions) {
+  if (enableCors) {
     app.enableCors(corsOptions);
-  } else {
-    app.enableCors();
   }
 
   const rootPath = `http://localhost:${port}/${globalPrefix}`;
