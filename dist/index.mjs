@@ -72,7 +72,14 @@ var createOpenApi = async (app, path, openApi, options, openApiPath) => {
 
 // src/nest-server.ts
 import { Logger, ValidationPipe } from "@nestjs/common";
-async function createNestApp({ name, docsUrl, module, corsOptions, openApiPath }, documentBuilder, swaggerOptions) {
+async function createNestApp({
+  name,
+  docsUrl,
+  module,
+  corsOptions,
+  openApiPath,
+  enableCors
+}, documentBuilder, swaggerOptions) {
   const app = await NestFactory.create(module);
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   const config = app.get(ConfigService);
@@ -87,10 +94,8 @@ async function createNestApp({ name, docsUrl, module, corsOptions, openApiPath }
     swaggerOptions,
     openApiPath
   );
-  if (environment === "production" && corsOptions) {
+  if (enableCors) {
     app.enableCors(corsOptions);
-  } else {
-    app.enableCors();
   }
   const rootPath = `http://localhost:${port}/${globalPrefix}`;
   await app.listen(port, () => {

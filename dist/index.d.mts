@@ -7,11 +7,12 @@ interface INestAppConfig {
     name: string;
     docsUrl: string;
     module: any;
+    enableCors?: boolean;
     corsOptions?: CorsOptions;
     openApiPath?: string;
     port?: number;
 }
-declare function createNestApp<T>({ name, docsUrl, module, corsOptions, openApiPath }: INestAppConfig, documentBuilder: Pick<OpenAPIObject, "openapi" | "info" | "servers" | "security" | "tags" | "externalDocs">, swaggerOptions?: SwaggerDocumentOptions): Promise<_nestjs_common.INestApplication<any>>;
+declare function createNestApp<T>({ name, docsUrl, module, corsOptions, openApiPath, enableCors, }: INestAppConfig, documentBuilder: Pick<OpenAPIObject, "openapi" | "info" | "servers" | "security" | "tags" | "externalDocs">, swaggerOptions?: SwaggerDocumentOptions): Promise<_nestjs_common.INestApplication<any>>;
 
 declare abstract class Service {
     logger: Logger;
